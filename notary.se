@@ -1,11 +1,25 @@
+
 # Notary
-
-# shared:
-
-# init:
-
+#
+# API
+#
+#   # Set a value
+#   call(NOTARY, ["set", key, value])
+#
+#   # Get a value
+#   call(NOTARY, ["get", key])
+#
 code:
-    # Notary(key, value)
-    key = data[0]
-    value = data[1]
-    storage[key] = value
+    command = msg.data[0]
+    arg1 = msg.data[1]
+    arg2 = msg.data[2]
+
+    if command == "get":
+        key = arg1
+        value = storage[key]
+        return(value)
+
+    if command == "set":
+        key = arg1
+        value = arg2
+        storage[key] = value
