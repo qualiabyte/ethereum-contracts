@@ -1,0 +1,11 @@
+# Notary
+
+# shared:
+
+# init:
+
+code:
+    # Notary(key, value)
+    key = data[0]
+    value = data[1]
+    storage[key] = value
