@@ -3,12 +3,17 @@
 #
 # API
 #
-#   # Set a value
-#   call(NOTARY, ["set", key, value])
-#
 #   # Get a value
 #   call(NOTARY, ["get", key])
 #
+#   # Set a value
+#   call(NOTARY, ["set", key, value])
+#
+init:
+    NAME = "Notary"
+    NAMEREG = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
+    call(NAMEREG, ["register", NAME], 2)
+
 code:
     command = msg.data[0]
     arg1 = msg.data[1]
