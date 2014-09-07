@@ -11,19 +11,28 @@
 #   # Set a value
 #   call(NOTARY, [SET, key, value], 3)
 #
+#   # Kill the notary (creator only)
+#   call(NOTARY, [KILL])
+#
 #   ALETH
 #
 #   data: "get" <key>                # Get
 #   data: "set" <key> <value>        # Set
+#   data: "kill"                     # Kill notary
 #
 shared:
-    GET = "get" * 2^(256 - 3*8)
-    SET = "set" * 2^(256 - 3*8)
+    GET         = "get"         * 2^(256 -   3*8)
+    SET         = "set"         * 2^(256 -   3*8)
+    KILL        = "kill"        * 2^(256 -   4*8)
+    REGISTER    = "register"    * 2^(256 -   8*8)
+    UNREGISTER  = "unregister"  * 2^(256 -  10*8)
+    NAMEREG     = 0x748be5e613eb857fa9d1f8a1e4e5198376ccd989
 
 init:
+    CREATOR = msg.sender
+    contract.storage[0] = CREATOR
+
     NAME = "Notary" * 2^(256 - 6*8)
-    NAMEREG = 0x748be5e613eb857fa9d1f8a1e4e5198376ccd989
-    REGISTER = "register" * 2^(256 - 8*8)
     call(NAMEREG, [REGISTER, NAME], 2)
 
 code:
@@ -40,3 +49,10 @@ code:
         key = arg1
         value = arg2
         contract.storage[key] = value
+
+    if command == KILL:
+        caller = msg.sender
+        CREATOR = contract.storage[0]
+        if caller == CREATOR:
+            call(NAMEREG, UNREGISTER)
+            suicide(CREATOR)
