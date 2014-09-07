@@ -10,8 +10,8 @@
 #   call(NOTARY, ["set", key, value], 3)
 #
 init:
-    NAME = "Notary"
-    NAMEREG = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
+    NAME = "Notary" * 2^(256 - 6*8)
+    NAMEREG = 0xf7b213a3bb696f68b3c422f631e14d42376790ff
     call(NAMEREG, ["register", NAME], 2)
 
 code:
@@ -21,10 +21,10 @@ code:
 
     if command == "get":
         key = arg1
-        value = storage[key]
+        value = contract.storage[key]
         return(value)
 
     if command == "set":
         key = arg1
         value = arg2
-        storage[key] = value
+        contract.storage[key] = value
