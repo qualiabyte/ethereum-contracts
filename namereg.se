@@ -1,0 +1,39 @@
+
+# NameReg
+#
+# API
+#
+#   # Register contract with name
+#   call(NAMEREG, ["register", name], 2)
+#
+#   # Get address by name
+#   call(NAMEREG, name)
+#
+#   # Get name by address
+#   call(NAMEREG, address)
+#
+init:
+    NAME = "NameReg!!" * 2^(256 - 9*8)
+    contract.storage[NAME] = contract.address
+    contract.storage[contract.address] = NAME
+
+code:
+    command = msg.data[0]
+    arg1 = msg.data[1]
+
+    if command == "register":
+        name = arg1
+        if contract.storage[name]:
+            stop
+        else:
+            caller = msg.sender
+            prevName = contract.storage[caller]
+            if prevName:
+                contract.storage[prevName] = 0
+            contract.storage[name] = caller
+            contract.storage[caller] = name
+
+    else:
+        key = command
+        value = contract.storage[key]
+        return(value)
