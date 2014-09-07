@@ -3,11 +3,18 @@
 #
 # API
 #
+#   SERPENT
+#
 #   # Get a value
 #   call(NOTARY, ["get", key], 2)
 #
 #   # Set a value
 #   call(NOTARY, ["set", key, value], 3)
+#
+#   ALETH
+#
+#   data: 0x676574 <key>                # Get
+#   data: 0x736574 <key> <value>        # Set
 #
 init:
     NAME = "Notary" * 2^(256 - 6*8)
