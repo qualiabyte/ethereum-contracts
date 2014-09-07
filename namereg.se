@@ -12,12 +12,22 @@
 #   # Get name by address
 #   call(NAMEREG, address)
 #
+#   # Unregister the calling address
+#   call(NAMEREG, "unregister")
+#
+#   # Kill the registry (creator only)
+#   call(NAMEREG, "kill")
+#
 init:
+    CREATOR = msg.sender
+    contract.storage[0] = CREATOR
+
     NAME = "NameReg!!" * 2^(256 - 9*8)
     contract.storage[NAME] = contract.address
     contract.storage[contract.address] = NAME
 
 code:
+    caller = msg.sender
     command = msg.data[0]
     arg1 = msg.data[1]
 
@@ -26,12 +36,24 @@ code:
         if contract.storage[name]:
             stop
         else:
-            caller = msg.sender
             prevName = contract.storage[caller]
             if prevName:
                 contract.storage[prevName] = 0
             contract.storage[name] = caller
             contract.storage[caller] = name
+
+    elif command == "unregister":
+        name = contract.storage[caller]
+        if name == 0:
+            stop
+        else:
+           contract.storage[caller] = 0
+           contract.storage[name] = 0
+
+    elif command == "kill":
+        CREATOR = contract.storage[0]
+        if caller == CREATOR:
+            suicide(CREATOR)
 
     else:
         key = command
