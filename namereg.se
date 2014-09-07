@@ -3,8 +3,10 @@
 #
 # API
 #
+#   SERPENT
+#
 #   # Register contract with name
-#   call(NAMEREG, ["register", name], 2)
+#   call(NAMEREG, [REGISTER, name], 2)
 #
 #   # Get address by name
 #   call(NAMEREG, name)
@@ -13,11 +15,24 @@
 #   call(NAMEREG, address)
 #
 #   # Unregister the calling address
-#   call(NAMEREG, "unregister")
+#   call(NAMEREG, UNREGISTER)
 #
 #   # Kill the registry (creator only)
-#   call(NAMEREG, "kill")
+#   call(NAMEREG, KILL)
 #
+#   ALETH
+#
+#   data: "register" <name>         # Register name
+#   data: <name>                    # Get address by name
+#   data: <address>                 # Get name by address
+#   data: "unregister"              # Unregister the caller
+#   data: "kill"                    # Kill registry
+#
+shared:
+    REGISTER    = "register"    * 2^(256 -  8*8)
+    UNREGISTER  = "unregister"  * 2^(256 - 10*8)
+    KILL        = "kill"        * 2^(256 -  4*8)
+
 init:
     CREATOR = msg.sender
     contract.storage[0] = CREATOR
@@ -31,7 +46,7 @@ code:
     command = msg.data[0]
     arg1 = msg.data[1]
 
-    if command == "register":
+    if command == REGISTER:
         name = arg1
         if contract.storage[name]:
             stop
@@ -42,7 +57,7 @@ code:
             contract.storage[name] = caller
             contract.storage[caller] = name
 
-    elif command == "unregister":
+    elif command == UNREGISTER:
         name = contract.storage[caller]
         if name == 0:
             stop
@@ -50,7 +65,7 @@ code:
            contract.storage[caller] = 0
            contract.storage[name] = 0
 
-    elif command == "kill":
+    elif command == KILL:
         CREATOR = contract.storage[0]
         if caller == CREATOR:
             suicide(CREATOR)

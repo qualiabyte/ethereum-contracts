@@ -22,7 +22,7 @@ shared:
 
 init:
     NAME = "Notary" * 2^(256 - 6*8)
-    NAMEREG = 0xf7b213a3bb696f68b3c422f631e14d42376790ff
+    NAMEREG = 0x748be5e613eb857fa9d1f8a1e4e5198376ccd989
     call(NAMEREG, ["register", NAME], 2)
 
 code:
