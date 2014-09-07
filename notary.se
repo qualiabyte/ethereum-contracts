@@ -4,10 +4,10 @@
 # API
 #
 #   # Get a value
-#   call(NOTARY, ["get", key])
+#   call(NOTARY, ["get", key], 2)
 #
 #   # Set a value
-#   call(NOTARY, ["set", key, value])
+#   call(NOTARY, ["set", key, value], 3)
 #
 init:
     NAME = "Notary"
