@@ -23,7 +23,8 @@ shared:
 init:
     NAME = "Notary" * 2^(256 - 6*8)
     NAMEREG = 0x748be5e613eb857fa9d1f8a1e4e5198376ccd989
-    call(NAMEREG, ["register", NAME], 2)
+    REGISTER = "register" * 2^(256 - 8*8)
+    call(NAMEREG, [REGISTER, NAME], 2)
 
 code:
     command = msg.data[0]
