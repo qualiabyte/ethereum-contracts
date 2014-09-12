@@ -1,0 +1,32 @@
+{
+  ;; Init
+  (def 'CREATOR 69)
+  [[ CREATOR ]] (caller)
+  [['NameReg!! ]] (address)
+  [[(address)]] 'NameReg!!
+
+  ;; Code
+  (returnlll {
+    (def 'command $0)
+    (def 'name $32)
+    (when (&& (= command 'register)
+              (= @@name 0)) {
+      (def 'prevName @@(caller))
+      [[ prevName ]] 0
+      [[ name ]] (caller)
+      [[(caller)]] name
+      (stop)
+    })
+    (when (= command 'unregister) {
+      [[@@(caller)]] 0
+      [[(caller)]] 0
+      (stop)
+    })
+    (when (&& (= command 'kill)
+              (= (caller) @@CREATOR)) {
+      (suicide @@CREATOR)
+    })
+    (def 'name command)
+    (return @@name)
+  })
+}
