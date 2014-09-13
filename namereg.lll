@@ -11,8 +11,8 @@
     (def 'name $32)
     (when (&& (= command 'register)
               (= @@name 0)) {
-      (def 'prevName @@(caller))
-      [[ prevName ]] 0
+      (def 'currentName @@(caller))
+      (when @@currentName [[ currentName ]] 0)
       [[ name ]] (caller)
       [[(caller)]] name
       (stop)
