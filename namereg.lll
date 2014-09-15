@@ -9,24 +9,29 @@
   (returnlll {
     (def 'command $0)
     (def 'name $32)
-    (when (&& (= command 'register)
-              (= @@name 0)) {
-      (def 'currentName @@(caller))
-      (when @@currentName [[ currentName ]] 0)
+    (def 'callerName @@(caller))
+
+    (when (= command 'register) {
+      (when @@name (stop))
+      (when @@callerName [[ callerName ]] 0)
       [[ name ]] (caller)
       [[(caller)]] name
       (stop)
     })
+
     (when (= command 'unregister) {
       [[@@(caller)]] 0
       [[(caller)]] 0
       (stop)
     })
-    (when (&& (= command 'kill)
-              (= (caller) @@CREATOR)) {
+
+    (when (= command 'kill)) {
+      (unless (= (caller) @@CREATOR) (stop))
       (suicide @@CREATOR)
     })
-    (def 'name command)
-    (return @@name)
+
+    (def 'key command)
+    (def 'value @@key)
+    (return value)
   })
 }
