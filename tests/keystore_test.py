@@ -23,20 +23,8 @@ def run(cmd):
 # Creates an lll contract
 def lll(state, path):
     code = run('lllc ' + path).rstrip().decode('hex')
-    contract = evm_contract(state, code)
+    contract = state.evm(code)
     return contract
-
-
-# Creates an evm contract
-def evm_contract(state, evm, sender=tester.k0, endowment=0):
-    from pyethereum import utils, processblock, transactions
-    nonce = state.block.get_nonce(utils.privtoaddr(sender))
-    tx = transactions.contract(nonce, 1, 10000, endowment, evm)
-    tx.sign(sender)
-    (success, address) = processblock.apply_transaction(state.block, tx)
-    if not success:
-        raise Exception("Contract creation failed")
-    return address
 
 
 # Loads a project file
