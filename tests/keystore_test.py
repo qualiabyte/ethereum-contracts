@@ -61,6 +61,11 @@ def str2num(string):
     return num
 
 
+# Aliases
+z = zpad
+zn = lambda s: str2num(zpad(s))
+
+
 #
 # TESTS
 #
@@ -101,15 +106,15 @@ def test_keystore_lll():
     keystore_tests(state, contract)
 
 
-def keystore_tests(state, contract):
-    result1 = state.send(tester.k0, contract, 0, [zpad('set'), 'abc', 123])
-    result2 = state.send(tester.k0, contract, 0, [zpad('get'), 'abc'])
-    result3 = state.send(tester.k0, contract, 0, [zpad('set'), 'foo', 'bar'])
-    result4 = state.send(tester.k0, contract, 0, [zpad('get'), 'foo'])
-    assert result1 == []
-    assert result2 == [123]
-    assert result3 == []
-    assert result4 == [str2num('bar')]
+def keystore_tests(s, c):
+
+    # Set a number value
+    assert s.send(t.k0, c, 0, [z('set'), 'abc', 123]) == []
+    assert s.send(t.k0, c, 0, [z('get'), 'abc']) == [123]
+
+    # Set a string value
+    assert s.send(t.k0, c, 0, [z('set'), 'foo', z('bar')]) == []
+    assert s.send(t.k0, c, 0, [z('get'), 'foo']) == [zn('bar')]
 
 
 #
@@ -132,7 +137,6 @@ def test_namereg_lll():
 
 
 def namereg_tests(s, c):
-    (z, zn) = zpad, (lambda s: str2num(zpad(s)))
 
     # Register users
     assert s.send(t.k0, c, 0, [z('register'), z('leonardo')]) == []
