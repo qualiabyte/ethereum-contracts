@@ -25,7 +25,7 @@
       (stop)
     })
 
-    (when (= command 'kill)) {
+    (when (= command 'kill) {
       (unless (= (caller) @@CREATOR) (stop))
       (suicide @@CREATOR)
     })
