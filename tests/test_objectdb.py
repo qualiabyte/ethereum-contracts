@@ -20,6 +20,10 @@ def objectdb_tests(s, c):
     # Define first account as object owner
     owner = int(t.a0, 16)
 
+    # Verify the contract creator
+    creator = owner
+    assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == [creator]
+
     # Add an object, verify the owner
     assert s.send(t.k0, c, 0, [z('add'), id_bin]) == []
     assert s.send(t.k0, c, 0, [z('get'), id_bin]) == [owner]
@@ -57,3 +61,7 @@ def objectdb_tests(s, c):
     max_key = 256**12 - 1
     assert s.send(t.k0, c, 0, [z('set'), id_bin, (min_key - 1), 123]) == [2]
     assert s.send(t.k0, c, 0, [z('set'), id_bin, (max_key + 1), 123]) == [3]
+
+    # Creator kills the contract
+    assert s.send(t.k0, c, 0, [z('kill')]) == []
+    assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == []
