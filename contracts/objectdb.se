@@ -11,6 +11,9 @@
 #   "kill"
 #
 shared:
+    # Public allows anyone to create and own objects
+    PUBLIC = 1
+
     # Byte lengths
     ID_SIZE = 20
     KEY_SIZE = 32 - ID_SIZE
@@ -38,6 +41,7 @@ init:
     contract.storage[CREATOR] = msg.sender
 
 code:
+    creator = contract.storage[CREATOR]
     caller = msg.sender
     command = msg.data[0]
     id = msg.data[1]
@@ -45,6 +49,8 @@ code:
     value = msg.data[3]
 
     if command == ADD:
+        if !PUBLIC and caller != creator:
+            return(0)
         if contract.storage[id] != 0:
             return(1)
         if id < MIN_ID:
@@ -63,6 +69,8 @@ code:
 
     elif command == SET:
         owner = contract.storage[id]
+        if !PUBLIC and caller != creator:
+            return(0)
         if caller != owner:
             return(1)
         if key < MIN_KEY:
