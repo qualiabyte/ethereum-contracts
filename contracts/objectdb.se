@@ -1,0 +1,79 @@
+
+# ObjectDB
+#
+#   An object database contract for Ethereum
+#
+# API
+#
+#   "add" <id>
+#   "get" <id> <key>
+#   "set" <id> <key> <value>
+#   "kill"
+#
+shared:
+    # Byte lengths
+    ID_SIZE = 20
+    KEY_SIZE = 32 - ID_SIZE
+
+    # Numeric value limits
+    MIN_ID = 0
+    MIN_KEY = 1
+    MAX_ID = 256^ID_SIZE - 1
+    MAX_KEY = 256^KEY_SIZE - 1
+
+    # Commands
+    ADD  = "add"  * 2^(256 - 3*8)
+    GET  = "get"  * 2^(256 - 3*8)
+    SET  = "set"  * 2^(256 - 3*8)
+    KILL = "kill" * 2^(256 - 4*8)
+
+    # Storage
+    CREATOR = 0
+
+init:
+    contract.storage[CREATOR] = msg.sender
+
+code:
+    caller = msg.sender
+    command = msg.data[0]
+    id = msg.data[1]
+    key = msg.data[2]
+    value = msg.data[3]
+
+    if command == ADD:
+        if contract.storage[id] != 0:
+            return(1)
+        if id < MIN_ID:
+             return(2)
+        if id > MAX_ID:
+            return(3)
+        contract.storage[id] = msg.sender
+
+    elif command == GET:
+        keySize = 1
+        while key / 256^keySize > 0:
+            keySize = keySize + 1
+        pos = id + key * 256^(ID_SIZE - keySize)
+        value = contract.storage[pos]
+        return(value)
+
+    elif command == SET:
+        owner = contract.storage[id]
+        if caller != owner:
+            return(1)
+        if key < MIN_KEY:
+            return(2)
+        if key > MAX_KEY:
+            return(3)
+        keySize = 1
+        while key / 256^keySize > 0:
+            keySize = keySize + 1
+        pos = id + key * 256^(ID_SIZE - keySize)
+        contract.storage[pos] = value
+
+    if command == KILL:
+        caller = msg.sender
+        creator = contract.storage[CREATOR]
+        if caller == creator:
+            call(NAMEREG, UNREGISTER)
+            suicide(creator)
