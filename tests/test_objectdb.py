@@ -62,6 +62,26 @@ def objectdb_tests(s, c):
     assert s.send(t.k0, c, 0, [z('set'), id_bin, (min_key - 1), 123]) == [2]
     assert s.send(t.k0, c, 0, [z('set'), id_bin, (max_key + 1), 123]) == [3]
 
+    # Set a medium key (6 bytes)
+    key_hex = 'aabbccddeeff'
+    key_bin = key_hex.decode('hex')
+    assert s.send(t.k0, c, 0, [z('set'), id_bin, key_bin, 456]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id_bin, key_bin]) == [456]
+
+    # Verify index format
+    index_hex = '000000000000aabbccddeeff0123456789012345678901234567890123456789'
+    assert s.block.get_storage_data(c, index_hex.decode('hex')) == 456
+
+    # Set a long key (12 bytes)
+    key_hex = 'aabbccddeeff' * 2
+    key_bin = key_hex.decode('hex')
+    assert s.send(t.k0, c, 0, [z('set'), id_bin, key_bin, 789]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id_bin, key_bin]) == [789]
+
+    # Verify index format
+    index_hex = 'aabbccddeeffaabbccddeeff0123456789012345678901234567890123456789'
+    assert s.block.get_storage_data(c, index_hex.decode('hex')) == 789
+
     # Creator kills the contract
     assert s.send(t.k0, c, 0, [z('kill')]) == []
     assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == []

@@ -60,10 +60,7 @@ code:
         contract.storage[id] = msg.sender
 
     elif command == GET:
-        keySize = 1
-        while key / 256^keySize > 0:
-            keySize += 1
-        pos = id + key * 256^(ID_SIZE - keySize)
+        pos = id + key * 256^ID_SIZE
         value = contract.storage[pos]
         return(value)
 
@@ -77,10 +74,7 @@ code:
             return(2)
         if key > MAX_KEY:
             return(3)
-        keySize = 1
-        while key / 256^keySize > 0:
-            keySize += 1
-        pos = id + key * 256^(ID_SIZE - keySize)
+        pos = id + key * 256^ID_SIZE
         contract.storage[pos] = value
 
     elif command == KILL:
