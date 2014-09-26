@@ -62,7 +62,7 @@ code:
     elif command == GET:
         keySize = 1
         while key / 256^keySize > 0:
-            keySize = keySize + 1
+            keySize += 1
         pos = id + key * 256^(ID_SIZE - keySize)
         value = contract.storage[pos]
         return(value)
@@ -79,7 +79,7 @@ code:
             return(3)
         keySize = 1
         while key / 256^keySize > 0:
-            keySize = keySize + 1
+            keySize += 1
         pos = id + key * 256^(ID_SIZE - keySize)
         contract.storage[pos] = value
 
