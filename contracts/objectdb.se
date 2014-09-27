@@ -3,12 +3,24 @@
 #
 #   An object database contract for Ethereum
 #
+# Overview
+#
+#   In public mode, anyone can add objects to the database.
+#   The first account to add an object becomes its owner.
+#   Only the object's owner can modify its properties.
+#
+#   In private mode, only the database creator may add objects.
+#   Thus, only they will own (and be able to modify) objects.
+#
+#   By default, public mode is enabled.
+#   In either mode, any account can read object properties.
+#
 # API
 #
-#   "add" <id>
-#   "get" <id> <key>
-#   "set" <id> <key> <value>
-#   "kill"
+#   "add" <id>                  # Add empty object    (20-byte id)
+#   "get" <id> <key>            # Get object property (12-byte key)
+#   "set" <id> <key> <value>    # Set object property (32-byte value)
+#   "kill"                      # Kill the database   (Creator only)
 #
 shared:
     # Public allows anyone to create and own objects
