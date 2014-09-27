@@ -42,13 +42,16 @@ shared:
     SET  = "set"  * 2^(256 - 3*8)
     KILL = "kill" * 2^(256 - 4*8)
 
+    # Namereg
+    NAME        = "ObjectDB"   * 2^(256 -   8*8)
+    NAMEREG     = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
+    REGISTER    = "register"   * 2^(256 -   8*8)
+    UNREGISTER  = "unregister" * 2^(256 -  10*8)
+
     # Storage
     CREATOR = 0
 
 init:
-    NAME      = "ObjectDB" * 2^(256 - 8*8)
-    REGISTER  = "register" * 2^(256 - 8*8)
-    NAMEREG   = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
     call(NAMEREG, [REGISTER, NAME], 2)
     contract.storage[CREATOR] = msg.sender
 
