@@ -37,16 +37,16 @@ shared:
     MAX_KEY = 256^KEY_SIZE - 1
 
     # Commands
-    ADD  = "add"  * 2^(256 - 3*8)
-    GET  = "get"  * 2^(256 - 3*8)
-    SET  = "set"  * 2^(256 - 3*8)
-    KILL = "kill" * 2^(256 - 4*8)
+    ADD  = "add"  * 256^(32 - 3)
+    GET  = "get"  * 256^(32 - 3)
+    SET  = "set"  * 256^(32 - 3)
+    KILL = "kill" * 256^(32 - 4)
 
     # Namereg
-    NAME        = "ObjectDB"   * 2^(256 -   8*8)
+    NAME        = "ObjectDB"   * 256^(32 -  8)
     NAMEREG     = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
-    REGISTER    = "register"   * 2^(256 -   8*8)
-    UNREGISTER  = "unregister" * 2^(256 -  10*8)
+    REGISTER    = "register"   * 256^(32 -  8)
+    UNREGISTER  = "unregister" * 256^(32 - 10)
 
     # Storage
     CREATOR = 0
