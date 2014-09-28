@@ -7,7 +7,7 @@ A collection of contracts for Ethereum
 + [Keystore](#keystore-serpent-lll)
 + [NameReg](#namereg-serpent-lll)
 
-## ObjectDB ([Serpent](contracts/objectdb.se))
+## ObjectDB ([Serpent](contracts/objectdb.se), [LLL](contracts/objectdb.lll))
 
 An object database contract for Ethereum
 
