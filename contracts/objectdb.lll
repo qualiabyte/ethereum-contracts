@@ -16,6 +16,13 @@
   (def 'MAX_ID (- (exp 256 ID_SIZE) 1))
   (def 'MAX_KEY (- (exp 256 KEY_SIZE) 1))
 
+  ;; Namereg
+  (def 'NAMEREG 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca)
+  (def 'unregister () {
+    [0] "unregister"
+    (call (- (gas) 100) NAMEREG 0 0 32 0 0)
+  })
+
   ;; Code
   (returnlll {
     (def 'command $0)
@@ -50,6 +57,7 @@
 
     (when (= command 'kill) {
       (unless (eq (caller) @@CREATOR) (stop))
+      (unregister)
       (suicide @@CREATOR)
     })
   })
