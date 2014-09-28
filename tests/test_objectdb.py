@@ -11,6 +11,13 @@ def test_objectdb_serpent():
     objectdb_tests(state, contract)
 
 
+def test_objectdb_lll():
+    path = 'contracts/objectdb.lll'
+    state = tester.state()
+    contract = lll(state, path)
+    objectdb_tests(state, contract)
+
+
 def objectdb_tests(s, c):
 
     # Create a 20-byte (160-bit) object id

@@ -1,0 +1,56 @@
+{
+  ;; Init
+  (def 'NAME 'ObjectDB) (regname NAME)
+  (def 'CREATOR 0) [[CREATOR]] (caller)
+
+  ;; Public allows anyone to create and own objects
+  (def 'PUBLIC 1)
+
+  ;; Byte lengths
+  (def 'ID_SIZE 20)
+  (def 'KEY_SIZE (- 32 ID_SIZE))
+
+  ;; Numeric value limits
+  (def 'MIN_ID 0)
+  (def 'MIN_KEY 1)
+  (def 'MAX_ID (- (exp 256 ID_SIZE) 1))
+  (def 'MAX_KEY (- (exp 256 KEY_SIZE) 1))
+
+  ;; Code
+  (returnlll {
+    (def 'command $0)
+    (def 'id $32)
+    (def 'key $64)
+    (def 'value $96)
+    (def 'pos (+ id (* key (exp 256 ID_SIZE))))
+
+    (when (= command 'add) {
+      (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (eq @@id 0) (return 1))
+      (when (slt id MIN_ID) (return 2))
+      (when (sgt id MAX_ID) (return 3))
+      [[ id ]] (caller)
+      (stop)
+    })
+
+    (when (= command 'get) {
+      (def 'currentValue @@pos)
+      (return currentValue)
+    })
+
+    (when (= command 'set) {
+      (def 'owner @@id)
+      (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (eq (caller) owner) (return 1))
+      (when (slt key MIN_KEY) (return 2))
+      (when (sgt key MAX_KEY) (return 3))
+      [[ pos ]] value
+      (stop)
+    })
+
+    (when (= command 'kill) {
+      (unless (eq (caller) @@CREATOR) (stop))
+      (suicide @@CREATOR)
+    })
+  })
+}
