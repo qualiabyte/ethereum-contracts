@@ -62,25 +62,26 @@ code:
     id = msg.data[1]
     key = msg.data[2]
     value = msg.data[3]
+    ID = id * 256^KEY_SIZE
 
     if command == ADD:
         if !PUBLIC and caller != creator:
             return(0)
-        if contract.storage[id] != 0:
+        if contract.storage[ID] != 0:
             return(1)
         if id < MIN_ID:
              return(2)
         if id > MAX_ID:
             return(3)
-        contract.storage[id] = msg.sender
+        contract.storage[ID] = msg.sender
 
     elif command == GET:
-        pos = id + key * 256^ID_SIZE
+        pos = ID + key
         value = contract.storage[pos]
         return(value)
 
     elif command == SET:
-        owner = contract.storage[id]
+        owner = contract.storage[ID]
         if !PUBLIC and caller != creator:
             return(0)
         if caller != owner:
@@ -89,7 +90,7 @@ code:
             return(2)
         if key > MAX_KEY:
             return(3)
-        pos = id + key * 256^ID_SIZE
+        pos = ID + key
         contract.storage[pos] = value
 
     elif command == KILL:

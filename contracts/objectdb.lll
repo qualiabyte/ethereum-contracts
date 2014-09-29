@@ -23,20 +23,25 @@
     (call (- (gas) 100) NAMEREG 0 0 32 0 0)
   })
 
+  ;; Reserved keys
+  (def 'OWNER 0)
+
   ;; Code
   (returnlll {
     (def 'command $0)
     (def 'id $32)
     (def 'key $64)
     (def 'value $96)
-    (def 'pos (+ id (* key (exp 256 ID_SIZE))))
+    (def 'index (id key) (+ key (* id (exp 256 KEY_SIZE))))
+    (def 'pos (index id key))
+    (def 'owner (index id OWNER))
 
     (when (= command 'add) {
       (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
-      (unless (eq @@id 0) (return 1))
+      (unless (eq @@owner 0) (return 1))
       (when (slt id MIN_ID) (return 2))
       (when (sgt id MAX_ID) (return 3))
-      [[ id ]] (caller)
+      [[ owner ]] (caller)
       (stop)
     })
 
@@ -46,9 +51,8 @@
     })
 
     (when (= command 'set) {
-      (def 'owner @@id)
       (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
-      (unless (eq (caller) owner) (return 1))
+      (unless (eq (caller) @@owner) (return 1))
       (when (slt key MIN_KEY) (return 2))
       (when (sgt key MAX_KEY) (return 3))
       [[ pos ]] value

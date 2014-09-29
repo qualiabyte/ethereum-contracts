@@ -47,9 +47,9 @@ def objectdb_tests(s, c):
     min_id = 0
     max_id = 256**20 - 1
     assert s.send(t.k0, c, 0, [z('add'), (min_id - 1)]) == [2]
-    assert s.send(t.k0, c, 0, [z('add'), (max_id + 1)]) == [3]
+    assert s.send(t.k0, c, 0, [z('add'), (max_id + 2)]) == [3]
     assert s.send(t.k0, c, 0, [z('get'), (min_id - 1)]) == [0]
-    assert s.send(t.k0, c, 0, [z('get'), (max_id + 1)]) == [0]
+    assert s.send(t.k0, c, 0, [z('get'), (max_id + 2)]) == [0]
 
     # Set a numeric property
     assert s.send(t.k0, c, 0, [z('set'), id_bin, 'abc', 123]) == []
@@ -76,7 +76,7 @@ def objectdb_tests(s, c):
     assert s.send(t.k0, c, 0, [z('get'), id_bin, key_bin]) == [456]
 
     # Verify index format
-    index_hex = '000000000000aabbccddeeff0123456789012345678901234567890123456789'
+    index_hex = '0123456789012345678901234567890123456789000000000000aabbccddeeff'
     assert s.block.get_storage_data(c, index_hex.decode('hex')) == 456
 
     # Set a long key (12 bytes)
@@ -86,7 +86,7 @@ def objectdb_tests(s, c):
     assert s.send(t.k0, c, 0, [z('get'), id_bin, key_bin]) == [789]
 
     # Verify index format
-    index_hex = 'aabbccddeeffaabbccddeeff0123456789012345678901234567890123456789'
+    index_hex = '0123456789012345678901234567890123456789aabbccddeeffaabbccddeeff'
     assert s.block.get_storage_data(c, index_hex.decode('hex')) == 789
 
     # Creator kills the contract
