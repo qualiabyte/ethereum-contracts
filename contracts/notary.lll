@@ -1,0 +1,112 @@
+
+;; Notary
+;;
+;;   A notary contract for Ethereum
+;;
+;; Overview
+;;
+;;   The notary allows accounts to submit a hash
+;;   which it will add to a public record.
+;;
+;;   Along with the hash, the notary records
+;;   the sender's address and a timestamp
+;;   of when the information was received.
+;;
+;;   After submission, the original sender
+;;   can provide additional information by
+;;   setting custom properties for the entry.
+;;
+;; Example
+;;
+;;   # Notarise a hash
+;;   "record" <id>
+;;
+;;   # Get default properties
+;;   "get" <id> "account"
+;;   "get" <id> "timestamp"
+;;
+;;   # Set custom properties
+;;   "set" <id> "my-note" "An arbitrary message"
+;;   "set" <id> "author"  "John Q. Public"
+;;
+;; API
+;;
+;;   "record" <id>                # Notarise a hash, submitter, and timestamp
+;;   "get"    <id> <key>          # Get a property
+;;   "set"    <id> <key> <value>  # Set a property
+;;
+{
+  ;; Init
+  (def 'NAME "Notary") (regname NAME)
+  (def 'CREATOR 0) [[CREATOR]] (caller)
+  (def 'DATABASE 1) [[DATABASE]] 0
+  (def 'COUNT 2) [[COUNT]] 0
+
+  ;; Namereg
+  (def 'NAMEREG 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca)
+  (def 'unregister () {
+    [0] "unregister"
+    (call (- (gas) 100) NAMEREG 0 0 32 0 0)
+  })
+
+  ;; Database
+  ;; (def 'DBNAME "NotaryDB")
+  ;; (def 'DB 0x4edd565b7f21721d2231fee3f856f3265e593212)
+
+  ;; Helpers
+  (def 'lshift (val n) (* val (exp 256 n)))
+  (def 'rshift (val n) (/ val (exp 256 n)))
+  (def 'lpad (str) {
+    (for [i]:0 (lshift str @i) [i](+ @i 1) {}) [length] @i
+    (rshift str (- 32 @length))
+  })
+
+  ;; Reserved keys
+  (def 'reserved (key) {
+    (or (eq key (lpad "account"))
+        (eq key (lpad "timestamp")))
+  })
+
+  ;; Code
+  (returnlll {
+    (def 'command $0)
+    (def 'id $32)
+    (def 'key $64)
+    (def 'value $96)
+    (def 'DB @@DATABASE)
+    (def 'db (cmd id key value) {
+      [0] cmd
+      [32] id
+      [64] key
+      [96] value
+      (call (- (gas) 100) DB 0 0 128 128 32)
+      @128
+    })
+
+    (when (= command 'record) {
+      [err]
+      (db 'add id 0 0)
+      (when @err (return @err))
+      (db 'set id (lpad "timestamp") (timestamp))
+      (db 'set id (lpad "account") (origin))
+    })
+    (when (= command 'get) {
+      (return (db 'get id key 0))
+    })
+    (when (= command 'set) {
+      [account] (db 'get id (lpad "account") 0)
+      (when (!= (caller) @account) (return 1))
+      (when (reserved key) (return 2))
+      (db 'set id key value)
+    })
+    (when (= command 'database) {
+      (unless (eq (caller) @@CREATOR) (return 1))
+      [[DATABASE]] $32
+    })
+    (when (= command 'kill) {
+      (unless (eq (caller) @@CREATOR) (stop))
+      (unregister)
+      (suicide @@CREATOR)
+    })
+  })
+}
