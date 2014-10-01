@@ -3,9 +3,46 @@
 
 A collection of contracts for Ethereum
 
-+ [ObjectDB](#objectdb-serpent)
++ [Notary](#notary-lll)
++ [ObjectDB](#objectdb-serpent-lll)
 + [Keystore](#keystore-serpent-lll)
 + [NameReg](#namereg-serpent-lll)
+
+## Notary ([LLL](contracts/notary.lll))
+
+A notary contract for Ethereum
+
+### Overview
+
+    The notary allows accounts to submit a hash
+    which it will add to a public record.
+
+    Along with the hash, the notary records
+    the sender's address and a timestamp
+    of when the information was received.
+
+    After submission, the original sender
+    can provide additional information by
+    setting custom properties for the entry.
+
+### Example
+
+    # Notarise a hash
+    "record" <id>
+
+    # Get default properties
+    "get" <id> "account"
+    "get" <id> "timestamp"
+
+    # Set custom properties
+    "set" <id> "my-note" "An arbitrary message"
+    "set" <id> "author"  "John Q. Public"
+
+### API
+
+    "record" <id>                # Notarise a hash, submitter, and timestamp
+    "get"    <id> <key>          # Get a property
+    "set"    <id> <key> <value>  # Set a property
 
 ## ObjectDB ([Serpent](contracts/objectdb.se), [LLL](contracts/objectdb.lll))
 
