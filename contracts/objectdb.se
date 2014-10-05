@@ -23,8 +23,10 @@
 #   "kill"                      # Kill the database   (Creator only)
 #
 shared:
-    # Public allows anyone to create and own objects
-    PUBLIC = 1
+    # Modes
+    PRIVATE_MODE = 0
+    PUBLIC_MODE  = 1
+    DEFAULT_MODE = PUBLIC_MODE
 
     # Byte lengths
     ID_SIZE = 20
@@ -37,10 +39,11 @@ shared:
     MAX_KEY = 256^KEY_SIZE - 1
 
     # Commands
-    ADD  = "add"  * 256^(32 - 3)
-    GET  = "get"  * 256^(32 - 3)
-    SET  = "set"  * 256^(32 - 3)
-    KILL = "kill" * 256^(32 - 4)
+    ADD    = "add"    * 256^(32 - 3)
+    GET    = "get"    * 256^(32 - 3)
+    SET    = "set"    * 256^(32 - 3)
+    CONFIG = "config" * 256^(32 - 6)
+    KILL   = "kill"   * 256^(32 - 4)
 
     # Namereg
     NAME        = "ObjectDB"   * 256^(32 -  8)
@@ -50,13 +53,16 @@ shared:
 
     # Storage
     CREATOR = 0
+    PUBLIC = 1
 
 init:
     call(NAMEREG, [REGISTER, NAME], 2)
     contract.storage[CREATOR] = msg.sender
+    contract.storage[PUBLIC] = DEFAULT_MODE
 
 code:
     creator = contract.storage[CREATOR]
+    public = contract.storage[PUBLIC]
     caller = msg.sender
     command = msg.data[0]
     id = msg.data[1]
@@ -65,7 +71,7 @@ code:
     ID = id * 256^KEY_SIZE
 
     if command == ADD:
-        if !PUBLIC and caller != creator:
+        if !public and caller != creator:
             return(0)
         if contract.storage[ID] != 0:
             return(1)
@@ -82,7 +88,7 @@ code:
 
     elif command == SET:
         owner = contract.storage[ID]
-        if !PUBLIC and caller != creator:
+        if !public and caller != creator:
             return(0)
         if caller != owner:
             return(1)
@@ -92,6 +98,15 @@ code:
             return(3)
         pos = ID + key
         contract.storage[pos] = value
+
+    elif command == CONFIG:
+        config_key = msg.data[1]
+        config_value = msg.data[2]
+        if caller != creator:
+            return(1)
+        if key == "mode"
+            mode = config_value
+            contract.storage[PUBLIC] = mode
 
     elif command == KILL:
         if caller == creator:

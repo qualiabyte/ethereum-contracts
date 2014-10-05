@@ -15,14 +15,47 @@ def test_objectdb_lll():
     path = 'contracts/objectdb.lll'
     state = tester.state()
     contract = lll(state, path)
+    private_tests(state, contract)
     objectdb_tests(state, contract)
 
 
+def private_tests(s, c):
+
+    # Storage address
+    PUBLIC = 1
+
+    # Disable public mode
+    assert s.send(t.k0, c, 0, [z('config'), z('mode'), 0]) == []
+    assert s.block.get_storage_data(c, PUBLIC) == 0
+
+    # Object id
+    id = 33
+
+    # Add by non-creator should fail
+    assert s.send(t.k1, c, 0, [z('add'), id]) == [0]
+    assert s.send(t.k1, c, 0, [z('get'), id, 0]) == [0]
+
+    # Add by creator should succeed
+    creator = int(t.a0, 16)
+    assert s.send(t.k0, c, 0, [z('add'), id]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id, 0]) == [creator]
+
+    # Set by creator should succeed
+    assert s.send(t.k0, c, 0, [z('set'), id, 'abc', 123]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id, 'abc']) == [123]
+
 def objectdb_tests(s, c):
+
+    # Storage address
+    PUBLIC = 1
 
     # Create a 20-byte (160-bit) object id
     id_hex = '0123456789' * 4
     id_bin = id_hex.decode('hex')
+
+    # Enable public mode
+    assert s.send(t.k0, c, 0, [z('config'), z('mode'), 1]) == []
+    assert s.block.get_storage_data(c, PUBLIC) == 1
 
     # Define first account as object owner
     owner = int(t.a0, 16)

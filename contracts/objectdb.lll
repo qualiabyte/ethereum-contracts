@@ -1,10 +1,13 @@
 {
+  ;; Modes
+  (def 'PRIVATE_MODE 0)
+  (def 'PUBLIC_MODE  1)
+  (def 'DEFAULT_MODE PUBLIC_MODE)
+
   ;; Init
   (def 'NAME 'ObjectDB) (regname NAME)
   (def 'CREATOR 0) [[CREATOR]] (caller)
-
-  ;; Public allows anyone to create and own objects
-  (def 'PUBLIC 1)
+  (def 'PUBLIC  1) [[PUBLIC]] DEFAULT_MODE
 
   ;; Byte lengths
   (def 'ID_SIZE 20)
@@ -37,7 +40,7 @@
     (def 'owner (index id OWNER))
 
     (when (= command 'add) {
-      (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (or @@PUBLIC (eq (caller) @@CREATOR)) (return 0))
       (unless (eq @@owner 0) (return 1))
       (when (slt id MIN_ID) (return 2))
       (when (sgt id MAX_ID) (return 3))
@@ -51,11 +54,19 @@
     })
 
     (when (= command 'set) {
-      (unless (or PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (or @@PUBLIC (eq (caller) @@CREATOR)) (return 0))
       (unless (eq (caller) @@owner) (return 1))
       (when (slt key MIN_KEY) (return 2))
       (when (sgt key MAX_KEY) (return 3))
       [[ pos ]] value
+      (stop)
+    })
+
+    (when (= command 'config) {
+      (def 'config_key $32)
+      (def 'config_value $64)
+      (unless (eq (caller) @@CREATOR) (return 1))
+      (when (eq config_key "mode") [[PUBLIC]] config_value)
       (stop)
     })
 
