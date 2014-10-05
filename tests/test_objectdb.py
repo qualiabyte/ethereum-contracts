@@ -25,7 +25,7 @@ def private_tests(s, c):
     PUBLIC = 1
 
     # Disable public mode
-    assert s.send(t.k0, c, 0, [z('config'), z('mode'), 0]) == []
+    assert s.send(t.k0, c, 0, [z('config'), z('public'), 0]) == []
     assert s.block.get_storage_data(c, PUBLIC) == 0
 
     # Object id
@@ -54,7 +54,7 @@ def objectdb_tests(s, c):
     id_bin = id_hex.decode('hex')
 
     # Enable public mode
-    assert s.send(t.k0, c, 0, [z('config'), z('mode'), 1]) == []
+    assert s.send(t.k0, c, 0, [z('config'), z('public'), 1]) == []
     assert s.block.get_storage_data(c, PUBLIC) == 1
 
     # Define first account as object owner

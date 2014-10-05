@@ -104,7 +104,7 @@ code:
         config_value = msg.data[2]
         if caller != creator:
             return(1)
-        if key == "mode"
+        if key == "public"
             mode = config_value
             contract.storage[PUBLIC] = mode
 
