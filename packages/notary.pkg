@@ -1,0 +1,12 @@
+# Package Name:       Notary
+# Package Author:     Tyler Florez
+# Package Email:      qualiabyte@gmail.com
+# Package Repository: https://github.com/qualiabyte/ethereum-contracts
+
+modify-deploy:
+  contracts/objectdb.lll => {{NotaryDB}}
+  (def 'NAME 'NotaryDB) (regname NAME)
+  contracts/notary.lll => {{Notary}}
+transact:
+  {{NotaryDB}} => config public 0
+  {{NotaryDB}} => config parent {{Notary}}
