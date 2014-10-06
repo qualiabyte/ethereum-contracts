@@ -21,6 +21,7 @@
 #   "get" <id> <key>            # Get object property (12-byte key)
 #   "set" <id> <key> <value>    # Set object property (32-byte value)
 #   "config" "public" <bool>    # Configure mode      (1 for public, 0 for private)
+#   "config" "parent" <address> # Configure parent    (Defaults to the creator)
 #   "kill"                      # Kill the database   (Parent only)
 #
 shared:

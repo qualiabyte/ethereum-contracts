@@ -14,16 +14,12 @@ A notary contract for Ethereum
 
 ### Overview
 
-    The notary allows accounts to submit a hash
-    which it will add to a public record.
-
-    Along with the hash, the notary records
-    the sender's address and a timestamp
-    of when the information was received.
-
-    After submission, the original sender
-    can provide additional information by
-    setting custom properties for the entry.
+    The notary allows accounts to submit a hash which it
+    will add to a public record.  Along with the hash, the
+    notary records the sender's address and a timestamp of
+    when the information was received.  After submission,
+    the original sender can provide additional information
+    by setting custom properties for the entry.
 
 ### Example
 
@@ -43,6 +39,8 @@ A notary contract for Ethereum
     "record" <id>                # Notarise a hash, submitter, and timestamp
     "get"    <id> <key>          # Get a property
     "set"    <id> <key> <value>  # Set a property
+    "database" <address>         # Set the database address (Creator only)
+    "kill"                       # Kill the notary          (Creator only)
 
 ## ObjectDB ([Serpent](contracts/objectdb.se), [LLL](contracts/objectdb.lll))
 
@@ -66,6 +64,7 @@ An object database contract for Ethereum
     "get" <id> <key>            # Get object property (12-byte key)
     "set" <id> <key> <value>    # Set object property (32-byte value)
     "config" "public" <bool>    # Configure mode      (1 for public, 0 for private)
+    "config" "parent" <address> # Configure parent    (Defaults to the creator)
     "kill"                      # Kill the database   (Parent only)
 
 ## KeyStore ([Serpent](contracts/keystore.se), [LLL](contracts/keystore.lll))

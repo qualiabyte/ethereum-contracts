@@ -5,16 +5,12 @@
 ;;
 ;; Overview
 ;;
-;;   The notary allows accounts to submit a hash
-;;   which it will add to a public record.
-;;
-;;   Along with the hash, the notary records
-;;   the sender's address and a timestamp
-;;   of when the information was received.
-;;
-;;   After submission, the original sender
-;;   can provide additional information by
-;;   setting custom properties for the entry.
+;;   The notary allows accounts to submit a hash which it
+;;   will add to a public record.  Along with the hash, the
+;;   notary records the sender's address and a timestamp of
+;;   when the information was received.  After submission,
+;;   the original sender can provide additional information
+;;   by setting custom properties for the entry.
 ;;
 ;; Example
 ;;
@@ -34,6 +30,8 @@
 ;;   "record" <id>                # Notarise a hash, submitter, and timestamp
 ;;   "get"    <id> <key>          # Get a property
 ;;   "set"    <id> <key> <value>  # Set a property
+;;   "database" <address>         # Set the database address (Creator only)
+;;   "kill"                       # Kill the notary          (Creator only)
 ;;
 {
   ;; Init
