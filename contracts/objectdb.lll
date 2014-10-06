@@ -6,7 +6,7 @@
 
   ;; Init
   (def 'NAME 'ObjectDB) (regname NAME)
-  (def 'CREATOR 0) [[CREATOR]] (caller)
+  (def 'PARENT 0) [[PARENT]] (caller)
   (def 'PUBLIC  1) [[PUBLIC]] DEFAULT_MODE
 
   ;; Byte lengths
@@ -40,7 +40,7 @@
     (def 'owner (index id OWNER))
 
     (when (= command 'add) {
-      (unless (or @@PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (or @@PUBLIC (eq (caller) @@PARENT)) (return 0))
       (unless (eq @@owner 0) (return 1))
       (when (slt id MIN_ID) (return 2))
       (when (sgt id MAX_ID) (return 3))
@@ -54,7 +54,7 @@
     })
 
     (when (= command 'set) {
-      (unless (or @@PUBLIC (eq (caller) @@CREATOR)) (return 0))
+      (unless (or @@PUBLIC (eq (caller) @@PARENT)) (return 0))
       (unless (eq (caller) @@owner) (return 1))
       (when (slt key MIN_KEY) (return 2))
       (when (sgt key MAX_KEY) (return 3))
@@ -65,16 +65,16 @@
     (when (= command 'config) {
       (def 'config_key $32)
       (def 'config_value $64)
-      (unless (eq (caller) @@CREATOR) (return 1))
+      (unless (eq (caller) @@PARENT) (return 1))
       (when (eq config_key "public") [[PUBLIC]] config_value)
-      (when (eq config_key "creator") [[CREATOR]] config_value)
+      (when (eq config_key "parent") [[PARENT]] config_value)
       (stop)
     })
 
     (when (= command 'kill) {
-      (unless (eq (caller) @@CREATOR) (stop))
+      (unless (eq (caller) @@PARENT) (stop))
       (unregister)
-      (suicide @@CREATOR)
+      (suicide @@PARENT)
     })
   })
 }

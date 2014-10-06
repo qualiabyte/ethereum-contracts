@@ -54,7 +54,7 @@ An object database contract for Ethereum
     The first account to add an object becomes its owner.
     Only the object's owner can modify its properties.
 
-    In private mode, only the database creator may add objects.
+    In private mode, only the database parent may add objects.
     Thus, only they will own (and be able to modify) objects.
 
     By default, public mode is enabled.
@@ -66,7 +66,7 @@ An object database contract for Ethereum
     "get" <id> <key>            # Get object property (12-byte key)
     "set" <id> <key> <value>    # Set object property (32-byte value)
     "config" "public" <bool>    # Configure mode      (1 for public, 0 for private)
-    "kill"                      # Kill the database   (Creator only)
+    "kill"                      # Kill the database   (Parent only)
 
 ## KeyStore ([Serpent](contracts/keystore.se), [LLL](contracts/keystore.lll))
 

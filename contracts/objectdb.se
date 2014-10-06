@@ -9,7 +9,7 @@
 #   The first account to add an object becomes its owner.
 #   Only the object's owner can modify its properties.
 #
-#   In private mode, only the database creator may add objects.
+#   In private mode, only the database parent may add objects.
 #   Thus, only they will own (and be able to modify) objects.
 #
 #   By default, public mode is enabled.
@@ -21,7 +21,7 @@
 #   "get" <id> <key>            # Get object property (12-byte key)
 #   "set" <id> <key> <value>    # Set object property (32-byte value)
 #   "config" "public" <bool>    # Configure mode      (1 for public, 0 for private)
-#   "kill"                      # Kill the database   (Creator only)
+#   "kill"                      # Kill the database   (Parent only)
 #
 shared:
     # Modes
@@ -53,16 +53,16 @@ shared:
     UNREGISTER  = "unregister" * 256^(32 - 10)
 
     # Storage
-    CREATOR = 0
+    PARENT = 0
     PUBLIC = 1
 
 init:
     call(NAMEREG, [REGISTER, NAME], 2)
-    contract.storage[CREATOR] = msg.sender
+    contract.storage[PARENT] = msg.sender
     contract.storage[PUBLIC] = DEFAULT_MODE
 
 code:
-    creator = contract.storage[CREATOR]
+    parent = contract.storage[PARENT]
     public = contract.storage[PUBLIC]
     caller = msg.sender
     command = msg.data[0]
@@ -72,7 +72,7 @@ code:
     ID = id * 256^KEY_SIZE
 
     if command == ADD:
-        if !public and caller != creator:
+        if !public and caller != parent:
             return(0)
         if contract.storage[ID] != 0:
             return(1)
@@ -89,7 +89,7 @@ code:
 
     elif command == SET:
         owner = contract.storage[ID]
-        if !public and caller != creator:
+        if !public and caller != parent:
             return(0)
         if caller != owner:
             return(1)
@@ -103,16 +103,16 @@ code:
     elif command == CONFIG:
         config_key = msg.data[1]
         config_value = msg.data[2]
-        if caller != creator:
+        if caller != parent:
             return(1)
         if key == "public"
             mode = config_value
             contract.storage[PUBLIC] = mode
-        if key == "creator"
+        if key == "parent"
             address = config_value
-            contract.storage[CREATOR] = address
+            contract.storage[PARENT] = address
 
     elif command == KILL:
-        if caller == creator:
+        if caller == parent:
             call(NAMEREG, UNREGISTER)
-            suicide(creator)
+            suicide(parent)
