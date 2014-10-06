@@ -23,19 +23,19 @@ def test_objectdb_lll():
 def config_tests(s, c):
 
     # Storage address
-    CREATOR = 0
+    PARENT = 0
 
     # Define users
     user0 = int(t.a0, 16)
     user1 = int(t.a1, 16)
 
-    # Change the creator
-    assert s.send(t.k0, c, 0, [z('config'), z('creator'), user1]) == []
-    assert s.block.get_storage_data(c, CREATOR) == user1
+    # Change the parent
+    assert s.send(t.k0, c, 0, [z('config'), z('parent'), user1]) == []
+    assert s.block.get_storage_data(c, PARENT) == user1
 
-    # Reset the creator
-    assert s.send(t.k1, c, 0, [z('config'), z('creator'), user0]) == []
-    assert s.block.get_storage_data(c, CREATOR) == user0
+    # Reset the parent
+    assert s.send(t.k1, c, 0, [z('config'), z('parent'), user0]) == []
+    assert s.block.get_storage_data(c, PARENT) == user0
 
 def private_tests(s, c):
 
@@ -49,16 +49,16 @@ def private_tests(s, c):
     # Object id
     id = 33
 
-    # Add by non-creator should fail
+    # Add by non-parent should fail
     assert s.send(t.k1, c, 0, [z('add'), id]) == [0]
     assert s.send(t.k1, c, 0, [z('get'), id, 0]) == [0]
 
-    # Add by creator should succeed
-    creator = int(t.a0, 16)
+    # Add by parent should succeed
+    parent = int(t.a0, 16)
     assert s.send(t.k0, c, 0, [z('add'), id]) == []
-    assert s.send(t.k0, c, 0, [z('get'), id, 0]) == [creator]
+    assert s.send(t.k0, c, 0, [z('get'), id, 0]) == [parent]
 
-    # Set by creator should succeed
+    # Set by parent should succeed
     assert s.send(t.k0, c, 0, [z('set'), id, 'abc', 123]) == []
     assert s.send(t.k0, c, 0, [z('get'), id, 'abc']) == [123]
 
@@ -78,9 +78,9 @@ def objectdb_tests(s, c):
     # Define first account as object owner
     owner = int(t.a0, 16)
 
-    # Verify the contract creator
-    creator = owner
-    assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == [creator]
+    # Verify the contract parent
+    parent = owner
+    assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == [parent]
 
     # Add an object, verify the owner
     assert s.send(t.k0, c, 0, [z('add'), id_bin]) == []
@@ -90,7 +90,7 @@ def objectdb_tests(s, c):
     assert s.send(t.k1, c, 0, [z('add'), id_bin]) == [1]
     assert s.send(t.k0, c, 0, [z('get'), id_bin]) == [owner]
 
-    # Add object with id 0 fails (owned by creator)
+    # Add object with id 0 fails (owned by parent)
     assert s.send(t.k1, c, 0, [z('add'), 0]) == [1]
     assert s.send(t.k0, c, 0, [z('get'), 0]) == [owner]
 
@@ -140,6 +140,6 @@ def objectdb_tests(s, c):
     index_hex = '0123456789012345678901234567890123456789aabbccddeeffaabbccddeeff'
     assert s.block.get_storage_data(c, index_hex.decode('hex')) == 789
 
-    # Creator kills the contract
+    # Parent kills the contract
     assert s.send(t.k0, c, 0, [z('kill')]) == []
     assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == []
