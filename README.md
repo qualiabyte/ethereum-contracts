@@ -65,6 +65,7 @@ An object database contract for Ethereum
     "add" <id>                  # Add empty object    (20-byte id)
     "get" <id> <key>            # Get object property (12-byte key)
     "set" <id> <key> <value>    # Set object property (32-byte value)
+    "config" "public" <bool>    # Configure mode      (1 for public, 0 for private)
     "kill"                      # Kill the database   (Creator only)
 
 ## KeyStore ([Serpent](contracts/keystore.se), [LLL](contracts/keystore.lll))
