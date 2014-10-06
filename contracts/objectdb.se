@@ -108,6 +108,9 @@ code:
         if key == "public"
             mode = config_value
             contract.storage[PUBLIC] = mode
+        if key == "creator"
+            address = config_value
+            contract.storage[CREATOR] = address
 
     elif command == KILL:
         if caller == creator:

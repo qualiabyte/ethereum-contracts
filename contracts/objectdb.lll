@@ -67,6 +67,7 @@
       (def 'config_value $64)
       (unless (eq (caller) @@CREATOR) (return 1))
       (when (eq config_key "public") [[PUBLIC]] config_value)
+      (when (eq config_key "creator") [[CREATOR]] config_value)
       (stop)
     })
 

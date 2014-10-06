@@ -15,9 +15,27 @@ def test_objectdb_lll():
     path = 'contracts/objectdb.lll'
     state = tester.state()
     contract = lll(state, path)
+    config_tests(state, contract)
     private_tests(state, contract)
     objectdb_tests(state, contract)
 
+
+def config_tests(s, c):
+
+    # Storage address
+    CREATOR = 0
+
+    # Define users
+    user0 = int(t.a0, 16)
+    user1 = int(t.a1, 16)
+
+    # Change the creator
+    assert s.send(t.k0, c, 0, [z('config'), z('creator'), user1]) == []
+    assert s.block.get_storage_data(c, CREATOR) == user1
+
+    # Reset the creator
+    assert s.send(t.k1, c, 0, [z('config'), z('creator'), user0]) == []
+    assert s.block.get_storage_data(c, CREATOR) == user0
 
 def private_tests(s, c):
 
