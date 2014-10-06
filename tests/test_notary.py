@@ -15,9 +15,16 @@ def test_notary_lll():
 
 def notary_tests(s, c, db):
 
+    # Storage addresses
+    CREATOR = 0
+
     # Set database address
     assert s.send(t.k0, c, 0, [z('database'), db]) == []
     assert s.block.get_storage_data(c, 1) == int(db, 16)
+
+    # Set notary as db creator
+    assert s.send(t.k0, db, 0, [z('config'), z('creator'), c]) == []
+    assert s.block.get_storage_data(db, CREATOR) == int(c, 16)
 
     # Define first account as submitter
     submitter = int(t.a0, 16)
@@ -48,3 +55,6 @@ def notary_tests(s, c, db):
     # Creator kills the contract
     assert s.send(t.k0, c, 0, [z('kill')]) == []
     assert s.send(t.k0, c, 0, [z('get'), 0, 0]) == []
+
+    # Verify database also killed
+    assert s.block.get_storage_data(db, CREATOR) == 0
