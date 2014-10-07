@@ -9,6 +9,8 @@ modify-deploy:
 deploy:
   ../contracts/notary.lll => {{Notary}}
 transact:
+  {{Notary}} => database {{NotaryDB}}
+transact:
   {{NotaryDB}} => config public 0x0
 transact:
   {{NotaryDB}} => config parent {{Notary}}
