@@ -4,9 +4,11 @@
 # Package Repository: https://github.com/qualiabyte/ethereum-contracts
 
 modify-deploy:
-  contracts/objectdb.lll => {{NotaryDB}}
-  (def 'NAME 'NotaryDB) (regname NAME)
-  contracts/notary.lll => {{Notary}}
+  ../contracts/objectdb.lll => {{NotaryDB}}
+  (def 'NAME 'ObjectDB) => (def 'NAME 'NotaryDB)
+deploy:
+  ../contracts/notary.lll => {{Notary}}
 transact:
-  {{NotaryDB}} => config public 0
+  {{NotaryDB}} => config public 0x0
+transact:
   {{NotaryDB}} => config parent {{Notary}}
