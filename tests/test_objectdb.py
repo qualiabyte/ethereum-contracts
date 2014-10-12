@@ -15,9 +15,17 @@ def test_objectdb_lll():
     path = 'contracts/objectdb.lll'
     state = tester.state()
     contract = lll(state, path)
-    config_tests(state, contract)
-    private_tests(state, contract)
     objectdb_tests(state, contract)
+
+
+def objectdb_tests(s, c):
+    config_tests(s, c)
+    private_tests(s, c)
+    public_tests(s, c)
+    id_tests(s, c)
+    key_tests(s, c)
+    value_tests(s, c)
+    cleanup_tests(s, c)
 
 
 def config_tests(s, c):
@@ -36,6 +44,7 @@ def config_tests(s, c):
     # Reset the parent
     assert s.send(t.k1, c, 0, [z('config'), z('parent'), user0]) == []
     assert s.block.get_storage_data(c, PARENT) == user0
+
 
 def private_tests(s, c):
 
@@ -62,7 +71,8 @@ def private_tests(s, c):
     assert s.send(t.k0, c, 0, [z('set'), id, 'abc', 123]) == []
     assert s.send(t.k0, c, 0, [z('get'), id, 'abc']) == [123]
 
-def objectdb_tests(s, c):
+
+def public_tests(s, c):
 
     # Storage address
     PUBLIC = 1
@@ -94,6 +104,20 @@ def objectdb_tests(s, c):
     assert s.send(t.k1, c, 0, [z('add'), 0]) == [1]
     assert s.send(t.k0, c, 0, [z('get'), 0]) == [owner]
 
+    # Set a numeric property
+    assert s.send(t.k0, c, 0, [z('set'), id_bin, 'abc', 123]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id_bin, 'abc']) == [123]
+
+    # Setting by non-owner fails
+    assert s.send(t.k1, c, 0, [z('set'), id_bin, 'abc', 456]) == [1]
+    assert s.send(t.k0, c, 0, [z('get'), id_bin, 'abc']) == [123]
+
+
+def id_tests(s, c):
+
+    # Define first account as object owner
+    owner = int(t.a0, 16)
+
     # Add object with invalid id fails
     min_id = 0
     max_id = 256**20 - 1
@@ -102,17 +126,24 @@ def objectdb_tests(s, c):
     assert s.send(t.k0, c, 0, [z('get'), (min_id - 1)]) == [0]
     assert s.send(t.k0, c, 0, [z('get'), (max_id + 2)]) == [0]
 
-    # Set a numeric property
-    assert s.send(t.k0, c, 0, [z('set'), id_bin, 'abc', 123]) == []
-    assert s.send(t.k0, c, 0, [z('get'), id_bin, 'abc']) == [123]
+    # Create medium length (10-byte) object id
+    id_hex = '01234567890123456789'
+    id_bin = id_hex.decode('hex')
 
-    # Set a string property
-    assert s.send(t.k0, c, 0, [z('set'), id_bin, 'foo', z('bar')]) == []
-    assert s.send(t.k0, c, 0, [z('get'), id_bin, 'foo']) == [zn('bar')]
+    # Add object, verify the owner
+    assert s.send(t.k0, c, 0, [z('add'), id_bin]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id_bin]) == [owner]
 
-    # Setting by non-owner fails
-    assert s.send(t.k1, c, 0, [z('set'), id_bin, 'abc', 456]) == [1]
-    assert s.send(t.k0, c, 0, [z('get'), id_bin, 'abc']) == [123]
+    # Verify id format
+    index_hex = '0000000000000000000001234567890123456789000000000000000000000000'
+    assert s.block.get_storage_data(c, index_hex.decode('hex')) == owner
+
+
+def key_tests(s, c):
+
+    # Create a 20-byte (160-bit) object id
+    id_hex = '0123456789' * 4
+    id_bin = id_hex.decode('hex')
 
     # Setting an invalid key fails
     min_key = 1
@@ -139,6 +170,30 @@ def objectdb_tests(s, c):
     # Verify index format
     index_hex = '0123456789012345678901234567890123456789aabbccddeeffaabbccddeeff'
     assert s.block.get_storage_data(c, index_hex.decode('hex')) == 789
+
+
+def value_tests(s, c):
+
+    # Object owner
+    owner = int(t.a0, 16)
+
+    # Object id
+    id = str2num('value-test')
+
+    # Add object, verify the owner
+    assert s.send(t.k0, c, 0, [z('add'), id]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id]) == [owner]
+
+    # Set a numeric property
+    assert s.send(t.k0, c, 0, [z('set'), id, 'abc', 123]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id, 'abc']) == [123]
+
+    # Set a string property
+    assert s.send(t.k0, c, 0, [z('set'), id, 'foo', z('bar')]) == []
+    assert s.send(t.k0, c, 0, [z('get'), id, 'foo']) == [zn('bar')]
+
+
+def cleanup_tests(s, c):
 
     # Parent kills the contract
     assert s.send(t.k0, c, 0, [z('kill')]) == []
