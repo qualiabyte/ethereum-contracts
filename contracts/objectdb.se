@@ -47,6 +47,10 @@ shared:
     CONFIG = "config" * 256^(32 - 6)
     KILL   = "kill"   * 256^(32 - 4)
 
+    # Config keys
+    CONFIG_PUBLIC = "public" * 256^(32 - 6)
+    CONFIG_PARENT = "parent" * 256^(32 - 6)
+
     # Namereg
     NAME        = "ObjectDB"   * 256^(32 -  8)
     NAMEREG     = 0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca
@@ -102,15 +106,15 @@ code:
         contract.storage[pos] = value
 
     elif command == CONFIG:
-        config_key = msg.data[1]
-        config_value = msg.data[2]
+        key = msg.data[1]
+        value = msg.data[2]
         if caller != parent:
             return(1)
-        if key == "public"
-            mode = config_value
+        if key == CONFIG_PUBLIC
+            mode = value
             contract.storage[PUBLIC] = mode
-        if key == "parent"
-            address = config_value
+        if key == CONFIG_PARENT
+            address = value
             contract.storage[PARENT] = address
 
     elif command == KILL:
