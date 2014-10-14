@@ -3,28 +3,30 @@
   <head>
     <meta charset="utf-8">
     <title>Notary Dapp (Ethereum)</title>
+    <style>
+      #new-record {
+        width: 40em;
+      }
+    </style>
   </head>
   <body>
 
     <h1>Notary</h1>
-    <p>A notary description here...</p>
 
     <h2>New Record</h2>
-    <p>Create a new record here...</p>
-    <form class="form-horizontal" role="form">
+    <form id="new-record" role="form">
       <div class="form-group">
         <input class="form-control" name="hash" placeholder="Your hash here...">
       </div>
-      <button class="btn btn-default" type="submit">Add record!</button>
+      <button class="btn btn-primary btn-block submit" type="submit">Add record!</button>
     </form>
 
     <h2>Records</h2>
-    <p>A list of current records here...</p>
     <div id="records"></div>
 
     <h2>My Records</h2>
     <div id="my-records"></div>
-    <p>A list of records published by me</p>
+    <p>A list of records published by me...</p>
     <p>With option to edit record by setting custom properties!</p>
 
     <h2>Debug</h2>
@@ -45,24 +47,49 @@
       var NOTARY = namereg(zpad('Notary'));
       var NOTARYDB = namereg(zpad('NotaryDB'));
 
-      // Demo
-      var notary = new Notary();
-      var messages = notary.messages();
-      var records = notary.records();
+      /**
+       * Notary App
+       */
 
-      for (var id in records) {
-        var record = records[id];
-        var html =
-          '<table class="record table">' +
-          '<tr><td>id</td><td><span class="record-id">' + record.id + '</span></td></tr>' +
-          '<tr><td>account</td><td><span class="record-account">' + record.account.substr(0, 10) + '...</span></td></tr>' +
-          '<tr><td>timestamp</td><td><span class="record-timestamp">' + record.timestamp + '</span></td></tr>' +
-          '<tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
-          '<tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
-          '</table>';
-        $('#records').append(html);
-      }
-      log('records: ', records);
+      var NotaryApp = function(notary) {
+        var self = this;
+        self.notary = notary;
+        self.init();
+      };
+
+      NotaryApp.prototype.init = function() {
+        var self = this;
+        $('#new-record').submit(function(event) {
+          var $form = $(event.target);
+          var hash = $form.find('[name=hash]').val();
+          event.preventDefault();
+          notary.record(hash);
+          self.update();
+        });
+        self.update();
+      };
+
+      NotaryApp.prototype.update = function() {
+        var self = this;
+        var records = self.notary.records();
+        log('records: ', records);
+
+        for (var id in records) {
+          var record = records[id];
+          var html =
+            '<table class="record table">' +
+            '<tr><td>id</td><td><span class="record-id">' + record.id + '</span></td></tr>' +
+            '<tr><td>account</td><td><span class="record-account">' + record.account.substr(0, 10) + '...</span></td></tr>' +
+            '<tr><td>timestamp</td><td><span class="record-timestamp">' + record.timestamp + '</span></td></tr>' +
+            '<tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
+            '<tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
+            '</table>';
+          $('#records').prepend(html);
+        }
+      };
+
+      var notary = new Notary();
+      var app = new NotaryApp(notary);
     </script>
   </body>
 </html>

@@ -1,13 +1,37 @@
 
-//
-// Notary
-//
+/**
+ * The Notary class provides a JavaScript API
+ * for using Notary contracts in the browser.
+ *
+ * @param options
+ * @param options.NOTARY
+ * @param options.NOTARYDB
+ */
 
 var Notary = function(options) {
   options = options || {};
   this.NOTARY = options.NOTARY || window.NOTARY;
   this.NOTARYDB = options.NOTARYDB || window.NOTARYDB;
 };
+
+/**
+ * Notarises a hash.
+ *
+ * This records an association between the hash and
+ * the sender's account and a current timestamp.
+ *
+ * @param {String} hash
+ */
+
+Notary.prototype.record = function(hash) {
+  log('Notary#record');
+};
+
+/**
+ * Gets messages sent to the notary contract.
+ *
+ * @returns {Array<Object>} messages
+ */
 
 Notary.prototype.messages = function() {
   var filter = {
@@ -16,6 +40,12 @@ Notary.prototype.messages = function() {
   var messages = eth.messages(filter);
   return messages;
 };
+
+/**
+ * Gets records notarised by the notary contract.
+ *
+ * @returns {Array<Object>} records
+ */
 
 Notary.prototype.records = function() {
   var records = {};
