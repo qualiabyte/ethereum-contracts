@@ -41,52 +41,11 @@
     <!-- Notary -->
     <script src="../scripts/helpers.js"></script>
     <script src="../scripts/notary.js"></script>
+    <script src="../notary/app.js"></script>
     <script>
-
       // Contracts
       var NOTARY = namereg(zpad('Notary'));
       var NOTARYDB = namereg(zpad('NotaryDB'));
-
-      /**
-       * Notary App
-       */
-
-      var NotaryApp = function(notary) {
-        var self = this;
-        self.notary = notary;
-        self.init();
-      };
-
-      NotaryApp.prototype.init = function() {
-        var self = this;
-        $('#new-record').submit(function(event) {
-          var $form = $(event.target);
-          var hash = $form.find('[name=hash]').val();
-          event.preventDefault();
-          notary.record(hash);
-          self.update();
-        });
-        self.update();
-      };
-
-      NotaryApp.prototype.update = function() {
-        var self = this;
-        var records = self.notary.records();
-        log('records: ', records);
-
-        for (var id in records) {
-          var record = records[id];
-          var html =
-            '<table class="record table">' +
-            '<tr><td>id</td><td><span class="record-id">' + record.id + '</span></td></tr>' +
-            '<tr><td>account</td><td><span class="record-account">' + record.account.substr(0, 10) + '...</span></td></tr>' +
-            '<tr><td>timestamp</td><td><span class="record-timestamp">' + record.timestamp + '</span></td></tr>' +
-            '<tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
-            '<tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
-            '</table>';
-          $('#records').prepend(html);
-        }
-      };
 
       var notary = new Notary();
       var app = new NotaryApp(notary);
