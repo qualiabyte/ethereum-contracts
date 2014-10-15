@@ -3,36 +3,39 @@
 // Helpers
 //
 
+var Helpers = {};
+
 // Contracts
-var NAMEREG = '0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca';
+Helpers.NAMEREG = '0x50441127ea5b9dfd835a9aba4e1dc9c1257b58ca';
 
 // Reads storage value from NameReg
-var namereg = function(key) {
+Helpers.namereg = function(key) {
   var value = eth.stateAt(NAMEREG, key);
   return value;
 };
 
 // Converts hex to int
-var int = function(hex) {
+Helpers.int = function(hex) {
   return parseInt(hex, 16);
 };
 
 // Converts hex to string
-var str = eth.toAscii;
+Helpers.str = eth.toAscii;
 
 // Converts string to hex, right-padded with nulls
-var zpad = eth.fromAscii;
+Helpers.zpad = eth.fromAscii;
 
 // Converts string to hex, up to numBytes
-var hex = function(str, numBytes) {
-  numBytes = numBytes || 32;
+Helpers.hex = function(str, numBytes) {
+  numBytes = numBytes || str.length;
   var digits = 2 * numBytes;
-  var start = 2 + 64 - digits;
-  return eth.fromAscii(str, 0).substr(start);
+  var start = Math.max(0, 64 - digits);
+  var bytes = eth.fromAscii(str, 0).substr(2);
+  return lpad(bytes, 64).substr(start);
 };
 
 // Left-pads a string, to length with character
-var lpad = function(str, len, char) {
+Helpers.lpad = function(str, len, char) {
   char = char || "0";
   while (str.length < len)
     str = char + str;
@@ -40,7 +43,7 @@ var lpad = function(str, len, char) {
 };
 
 // Right-pads a string, to length with character
-var rpad = function(str, len, char) {
+Helpers.rpad = function(str, len, char) {
   char = char || "0";
   while (str.length < len)
     str += char;
@@ -48,16 +51,26 @@ var rpad = function(str, len, char) {
 };
 
 // Gets 32-byte parameter from transaction data
-var param = function(data, index) {
+Helpers.param = function(data, index) {
   var offset = index * 32;
   var string = str(data).substr(offset, offset + 31);
   return string;
 };
 
+// Gets 32-byte parameters from transaction data
+Helpers.params = function(str) {
+  var re = /(.{32})/g;
+  var matches;
+  var data = [];
+  while (matches = re.exec(str))
+    data.push(matches[1]);
+  return data;
+};
+
 // Debug
-var $debug = $('#debug');
-var log = function() {
-  for (i in arguments) {
+Helpers.$debug = $('#debug');
+Helpers.log = function() {
+  for (var i in arguments) {
     arg = typeof arguments[i] == 'string'
       ? arguments[i]
       : JSON.stringify(arguments[i], null, '  ');
@@ -65,3 +78,5 @@ var log = function() {
   }
   $debug.append('\n');
 };
+
+$.extend(this, Helpers);
