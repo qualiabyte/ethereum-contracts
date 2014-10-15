@@ -17,18 +17,57 @@ var Notary = function(options) {
 /**
  * Notarises a hash.
  *
- * This records an association between the hash and
+ * This records an association between the hash,
  * the sender's account and a current timestamp.
  *
+ * Example
+ *
+ *   notary.record('0xabcd', cb);
+ *
  * @param {String} hash
+ * @param {Function} callback(err)
+ * @param {Error} err
  */
 
-Notary.prototype.record = function(hash) {
-  log('Notary#record');
+Notary.prototype.record = function(hash, callback) {
+  var self = this;
+
+  // Strip prefix, if present
+  if (/^0x/.test(hash))
+    hash = hash.substr(2);
+
+  // Take lowest 20 bytes, if necessary
+  if (hash.length > 40)
+    hash = hash.substr(hash.length - 40);
+
+  var ID = '0x' + hash;
+  var params = {
+    from: eth.key,
+    value: 0,
+    to: self.NOTARY,
+    data: ["record", ID],
+    gas: 10000,
+    gasPrice: 10
+  };
+  var done = function(output) {
+    var data = Helpers.params(output);
+    var code = data[0];
+    var msg;
+    switch (code) {
+      case 1: msg = "Notary lacks database permissions."; break;
+      case 2: msg = "Hash must be 20 bytes or less."; break;
+      case 3: msg = "Hash must not be empty."; break;
+    }
+    var err = msg ? new Error(msg) : null;
+    callback(err, data);
+  };
+  eth.transact(params, done);
 };
 
 /**
  * Gets messages sent to the notary contract.
+ *
+ *   messages = notary.messages();
  *
  * @returns {Array<Object>} messages
  */
@@ -44,7 +83,9 @@ Notary.prototype.messages = function() {
 /**
  * Gets records notarised by the notary contract.
  *
- * @returns {Array<Object>} records
+ *   records = notary.records();
+ *
+ * @returns {Object} records
  */
 
 Notary.prototype.records = function() {
