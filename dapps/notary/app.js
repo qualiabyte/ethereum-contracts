@@ -48,6 +48,6 @@ NotaryApp.prototype.update = function() {
       '<tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
       '<tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
       '</table>';
-    $('#records').prepend(html);
+    $('#records').append(html);
   }
 };
