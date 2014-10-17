@@ -20,10 +20,14 @@ Helpers.int = function(hex) {
 };
 
 // Converts hex to string
-Helpers.str = eth.toAscii;
+Helpers.str = function() {
+  return eth.toAscii.apply(eth, arguments);
+};
 
 // Converts string to hex, right-padded with nulls
-Helpers.zpad = eth.fromAscii;
+Helpers.zpad = function() {
+  return eth.fromAscii.apply(eth, arguments);
+};
 
 // Converts string to hex, up to numBytes
 Helpers.hex = function(str, numBytes) {
