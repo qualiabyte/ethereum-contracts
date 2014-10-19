@@ -141,7 +141,7 @@ Notary.prototype.messages = function() {
 
 Notary.prototype.records = function() {
   var records = {};
-  var messages = this.messages();
+  var messages = this.messages().reverse();
   for (var i = 0; i < messages.length; i++) {
     var m = messages[i];
     var command = param(m.input, 0);
@@ -165,9 +165,21 @@ Notary.prototype.records = function() {
         account: account,
         username: username,
         timestamp: timestamp,
-        created_at: new Date(timestamp * 1000)
+        created_at: new Date(timestamp * 1000),
+        properties: {}
       };
       records[id] = record;
+    }
+    else if (/^set/.test(command)) {
+      var inputs = Helpers.params(m.input);
+      var id = hex(inputs[1], 20);
+      var key = inputs[2];
+      var value = inputs[3];
+      var record = records[id];
+      if (!record)
+        continue;
+
+      records[id].properties[key] = value;
     }
   }
   return records;
