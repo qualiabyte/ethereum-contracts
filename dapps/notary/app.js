@@ -26,7 +26,7 @@ NotaryApp.prototype.init = function() {
     if (/[^0-9a-f]/.test(hash))
       hash = hex(hash, 20);
 
-    notary.record(hash, function(err) {
+    self.notary.record(hash, function(err) {
       self.update();
     });
   });
@@ -38,16 +38,44 @@ NotaryApp.prototype.update = function() {
   var records = self.notary.records();
   $('#records').empty();
 
-  for (var id in records) {
+  for (var id in records) { (function() {
     var record = records[id];
     var html =
       '<table class="record table">' +
-      '<tr><td>id</td><td><span class="record-id">' + record.id + '</span></td></tr>' +
-      '<tr><td>account</td><td><span class="record-account">' + record.account.substr(0, 10) + '...</span></td></tr>' +
-      '<tr><td>timestamp</td><td><span class="record-timestamp">' + record.timestamp + '</span></td></tr>' +
-      '<tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
-      '<tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
-      '</table>';
-    $('#records').append(html);
-  }
+      '  <tr><td>id</td><td><span class="record-id">' + record.id + '</span></td></tr>' +
+      '  <tr><td>account</td><td><span class="record-account">' + record.account.substr(0, 10) + '...</span></td></tr>' +
+      '  <tr><td>timestamp</td><td><span class="record-timestamp">' + record.timestamp + '</span></td></tr>' +
+      '  <tr><td>username</td><td><span class="record-username">' + record.username + '</span></td></tr>' +
+      '  <tr><td>created_at</td><td><span class="record-date">' + record.created_at.toISOString() + '</span></td></tr>' +
+      '</table>' +
+      '<a class="set-property" data-id="' + record.id + '" href="#">Set custom property</a>' +
+      '<form class="new-property" role="form" style="display: none">' +
+      '  <div class="form-group">' +
+      '    <input class="form-control" name="key" placeholder="A 12-byte key">' +
+      '    <input class="form-control" name="value" placeholder="A 32-byte value">' +
+      '  </div>' +
+      '  <button class="btn btn-primary" type="submit">Set property!</button>' +
+      '</form>';
+    var $elem = $(html);
+    var $form = $elem.filter('.new-property');
+    var $key = $form.find('[name="key"]');
+    var $value = $form.find('[name="value"]');
+    var $setProp = $elem.filter('.set-property');
+    $setProp.click(function(event) {
+      event.preventDefault();
+      $form.toggle(150);
+    });
+    $form.submit(function(event) {
+      event.preventDefault();
+      var key = $key.val();
+      var value = $value.val();
+      self.notary.set(id, key, value, function(err) {
+        self.update();
+      });
+    });
+    if (record.account == eth.secretToAddress(eth.key)) {
+      $setProp.show();
+    }
+    $('#records').append($elem);
+  }()) }
 };
