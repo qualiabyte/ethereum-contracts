@@ -80,13 +80,18 @@ Helpers.param = function(data, index) {
 };
 
 // Gets 32-byte parameters from transaction data
-Helpers.params = function(str) {
-  var re = /(.{32})/g;
+Helpers.params = function(data) {
+  if (/^0x/.test(data))
+    data = data.substr(2);
+  var re = /(.{64})/g;
   var matches;
-  var data = [];
-  while (matches = re.exec(str))
-    data.push(matches[1]);
-  return data;
+  var params = [];
+  while (matches = re.exec(data)) {
+    var paramHex = '0x' + matches[1];
+    var param = lstrip(str(paramHex), '\x00');
+    params.push(param);
+  }
+  return params;
 };
 
 // Debug
