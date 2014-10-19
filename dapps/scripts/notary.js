@@ -51,12 +51,63 @@ Notary.prototype.record = function(hash, callback) {
   };
   var done = function(output) {
     var data = Helpers.params(output);
-    var code = data[0];
+    var code = int('0x' + hex(data[0]));
     var msg;
     switch (code) {
       case 1: msg = "Notary lacks database permissions."; break;
       case 2: msg = "Hash must be 20 bytes or less."; break;
       case 3: msg = "Hash must not be empty."; break;
+    }
+    var err = msg ? new Error(msg) : null;
+    callback(err, data);
+  };
+  eth.transact(params, done);
+};
+
+/**
+ * Sets a custom property on a notary record.
+ *
+ * Example
+ *
+ *   notary.set('0xabcd', 'my-key', 'my-value', cb);
+ *
+ * @param {String} id
+ * @param {String} key
+ * @param {String} value
+ * @param {Function} callback(err)
+ * @param {Error} err
+ */
+
+Notary.prototype.set = function(id, key, value, callback) {
+  var self = this;
+
+  // Strip prefix, if present
+  if (/^0x/.test(id))
+    id = id.substr(2);
+
+  // Take lowest 20 bytes, if necessary
+  if (id.length > 40)
+    id = id.substr(id.length - 40);
+
+  var ID = '0x' + id;
+  var KEY = '0x' + hex(key, 12);
+  var VALUE = '0x' + hex(value, 32);
+
+  var params = {
+    from: eth.key,
+    value: 0,
+    to: self.NOTARY,
+    data: ["set", ID, KEY, VALUE],
+    gas: 10000,
+    gasPrice: 10
+  };
+  var done = function(output) {
+    var data = Helpers.params(output);
+    var code = int('0x' + hex(data[0]));
+    var msg;
+    switch (code) {
+      case 1: msg = "Only record owner may set properties."; break;
+      case 2: msg = "Reserved keys may not be overriden."; break;
     }
     var err = msg ? new Error(msg) : null;
     callback(err, data);
