@@ -31,6 +31,7 @@ Helpers.zpad = function() {
 
 // Converts string to hex, up to numBytes
 Helpers.hex = function(str, numBytes) {
+  str = str || '';
   numBytes = numBytes || str.length;
   var digits = 2 * numBytes;
   var start = Math.max(0, 64 - digits);
@@ -52,6 +53,23 @@ Helpers.rpad = function(str, len, char) {
   while (str.length < len)
     str += char;
   return str;
+};
+
+// Strips characters from left end of string
+Helpers.lstrip = function(str, char) {
+  char = char || '0';
+  return str.replace(new RegExp('^(' + char + '+)'), '');
+};
+
+// Strips characters from right end of string
+Helpers.rstrip = function(str, char) {
+  char = char || '0';
+  return str.replace(new RegExp('(' + char + '+)$'), '');
+};
+
+// Strips characters from both ends of string
+Helpers.strip = function(str, char) {
+  return lstrip(rstrip(str, char), char);
 };
 
 // Gets 32-byte parameter from transaction data
